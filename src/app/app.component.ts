@@ -28,7 +28,7 @@ export class AppComponent {
     'orderTotal',
   ];
 
-  dataSource: Signal<Order[] | undefined> = toSignal(
+  public readonly dataSource: Signal<Order[] | undefined> = toSignal(
     this._ordersService.orders
   );
 
