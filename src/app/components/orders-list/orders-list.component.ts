@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  Signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -6,12 +11,14 @@ import { Router } from '@angular/router';
 import { interval, retry, switchMap } from 'rxjs';
 import { Order } from '../../shared/interfaces/Order';
 import { OrderService } from '../../shared/services/order.service';
+import { OrdersFilterComponent } from './orders-filter/orders-filter.component';
+import { OrderFilter } from '../../shared/interfaces/OrderFilter';
 
 @Component({
   selector: 'app-orders-list',
-  imports: [MatTableModule, MatIconModule],
+  imports: [MatTableModule, MatIconModule, OrdersFilterComponent],
   templateUrl: './orders-list.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdersListComponent {
   private readonly _ordersService = inject(OrderService);
@@ -30,11 +37,15 @@ export class OrdersListComponent {
     this._ordersService.orders
   );
 
+  public readonly filter!: OrderFilter;
+
   constructor() {
     interval(30000)
       .pipe(
         takeUntilDestroyed(),
-        switchMap(() => this._ordersService.getOrders().pipe(retry(2)))
+        switchMap(() =>
+          this._ordersService.getOrders(this.filter).pipe(retry(2))
+        )
       )
       .subscribe();
   }

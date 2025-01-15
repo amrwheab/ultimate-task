@@ -1,5 +1,6 @@
 import { OrderStatus } from '../Enums/order-status.enum';
 import { Order } from '../interfaces/Order';
+import { OrderFilter } from '../interfaces/OrderFilter';
 
 const generateOrderId = (index: number): string =>
   `ORD${(index + 1).toString().padStart(3, '0')}`;
@@ -45,14 +46,22 @@ const products = [
   { productName: 'Tablet', price: 300 },
 ];
 
-export const getOrdersData = (count: number) =>
-  Array.from({ length: count }, (_, index) => {
+export const getOrdersData = (length: number, filter: OrderFilter) => {
+  return Array.from({ length }, (_, index) => {
     const randomCustomer =
       customers[Math.floor(Math.random() * customers.length)];
-    const randomStatus =
-      Object.values(OrderStatus)[
-        Math.floor(Math.random() * Object.values(OrderStatus).length)
-      ];
+
+    let randomStatus: OrderStatus = OrderStatus.All;
+
+    if (filter && filter.status) {
+      randomStatus = filter.status as OrderStatus;
+    } else {
+      randomStatus =
+        Object.values(OrderStatus)[
+          Math.floor(Math.random() * (Object.values(OrderStatus).length - 1) + 1)
+        ];
+    }
+
     const numItems = Math.floor(Math.random() * 3) + 1;
     const orderItems = Array.from({ length: numItems }, () => {
       const randomProduct =
@@ -64,10 +73,12 @@ export const getOrdersData = (count: number) =>
         price: randomProduct.price,
       };
     });
-    const orderTotal = orderItems.reduce(
+
+    let orderTotal = orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
+
     const orderDate = new Date(
       2025,
       Math.floor(Math.random() * 12),
@@ -76,12 +87,21 @@ export const getOrdersData = (count: number) =>
       .toISOString()
       .split('T')[0];
 
+    if (filter.total && filter.comparison) {
+      if (filter.comparison === '1' && orderTotal <= filter.total) {
+        orderTotal = filter.total + Math.floor(Math.random() * 100) + 1;
+      } else if (filter.comparison === '0' && orderTotal >= filter.total) {
+        orderTotal = filter.total - Math.floor(Math.random() * 100) - 1;
+      }
+    }
+
     return {
       orderId: generateOrderId(index),
       customerName: randomCustomer,
       orderStatus: randomStatus,
-      orderTotal: orderTotal,
+      orderTotal: Math.max(0, orderTotal),
       orderDate,
       items: orderItems,
     };
   });
+};

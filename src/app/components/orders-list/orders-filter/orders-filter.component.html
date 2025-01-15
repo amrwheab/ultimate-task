@@ -1,0 +1,31 @@
+<form [formGroup]="form">
+
+  <div class="grid md:grid-cols-4 gap-2 place-items-center">
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        @for (status of orderStatus; track $index) {
+          <mat-option [value]="status" class="capitalize">{{status}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Total</mat-label>
+      <input matInput formControlName="total" type="number" />
+    </mat-form-field>
+
+    <mat-radio-group formControlName="comparison" class="w-full">
+      <mat-radio-button value="1">Greater Than</mat-radio-button>
+      <mat-radio-button value="0">Lower Than</mat-radio-button>
+    </mat-radio-group>
+
+    <div class="flex gap-2">
+      <button mat-flat-button color="primary" (click)="applyFilter()">Apply</button>
+
+      <button mat-stroked-button (click)="reset()">Reset</button>
+    </div>
+  </div>
+
+
+</form>
