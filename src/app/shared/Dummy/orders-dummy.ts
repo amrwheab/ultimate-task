@@ -87,7 +87,7 @@ export const getOrdersData = (length: number, filter: OrderFilter) => {
       .toISOString()
       .split('T')[0];
 
-    if (filter.total && filter.comparison) {
+    if (filter && filter.total && filter.comparison) {
       if (filter.comparison === '1' && orderTotal <= filter.total) {
         orderTotal = filter.total + Math.floor(Math.random() * 100) + 1;
       } else if (filter.comparison === '0' && orderTotal >= filter.total) {

@@ -1,7 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
+  signal,
   Signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -13,10 +15,17 @@ import { Order } from '../../shared/interfaces/Order';
 import { OrderService } from '../../shared/services/order.service';
 import { OrdersFilterComponent } from './orders-filter/orders-filter.component';
 import { OrderFilter } from '../../shared/interfaces/OrderFilter';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-orders-list',
-  imports: [MatTableModule, MatIconModule, OrdersFilterComponent],
+  imports: [
+    MatTableModule,
+    MatIconModule,
+    OrdersFilterComponent,
+    MatSort,
+    MatSortModule,
+  ],
   templateUrl: './orders-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,11 +42,45 @@ export class OrdersListComponent {
     'action',
   ];
 
-  public readonly dataSource: Signal<Order[] | undefined> = toSignal(
+  private readonly _dataSource: Signal<Order[] | undefined> = toSignal(
     this._ordersService.orders
   );
 
+  public readonly sortedDataSource = computed(() => {
+    switch (this.sortValue().active) {
+      case 'orderDate':
+        return [
+          ...(this._dataSource() || []).sort((a, b) =>
+            this.sortValue().direction === 'asc'
+              ? Date.parse(a.orderDate) - Date.parse(b.orderDate)
+              : Date.parse(b.orderDate) - Date.parse(a.orderDate)
+          ),
+        ];
+      case 'orderStatus':
+        return [
+          ...(this._dataSource() || []).sort((a, b) =>
+            this.sortValue().direction === 'asc'
+              ? a.orderStatus.localeCompare(b.orderStatus)
+              : b.orderStatus.localeCompare(a.orderStatus)
+          ),
+        ];
+      case 'orderTotal':
+        return [
+          ...(this._dataSource() || []).sort((a, b) =>
+            this.sortValue().direction === 'asc'
+              ? a.orderTotal - b.orderTotal
+              : b.orderTotal - a.orderTotal
+          ),
+        ];
+
+      default:
+        return [...(this._dataSource() || [])];
+    }
+  });
+
   public readonly filter!: OrderFilter;
+
+  public readonly sortValue = signal<Sort>({ active: '', direction: '' });
 
   constructor() {
     interval(30000)
@@ -53,5 +96,9 @@ export class OrdersListComponent {
   selectCurrentOrder(order: Order): void {
     this._ordersService.currentOrder = order;
     this._router.navigate(['/orders', order.orderId]);
+  }
+
+  sortChange(e: Sort): void {
+    this.sortValue.set(e);
   }
 }
