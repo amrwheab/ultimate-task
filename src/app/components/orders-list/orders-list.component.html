@@ -1,5 +1,7 @@
 <app-orders-filter [(filter)]="filter" />
 
+<hr class="my-3">
+
 <div class="overflow-x-auto mt-3">
   <table mat-table [dataSource]="dataSource() || []" class="mat-elevation-z8">
     <ng-container matColumnDef="orderId">
