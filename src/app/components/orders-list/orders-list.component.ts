@@ -1,4 +1,4 @@
-import { Component, inject, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -11,6 +11,7 @@ import { OrderService } from '../../shared/services/order.service';
   selector: 'app-orders-list',
   imports: [MatTableModule, MatIconModule],
   templateUrl: './orders-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OrdersListComponent {
   private readonly _ordersService = inject(OrderService);
