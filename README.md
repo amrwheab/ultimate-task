@@ -27,7 +27,7 @@ the project consist of : <br>
 4 - Change detection strategy (OnPush). <br>
 
 ### How to install project locally and see it on localhost?
-1 - open cmd in the prefered path on your disk.
+1 - open cmd in the prefered path on your disk. <br>
 2 - run this GIT command :
 ```
 git clone https://github.com/amrwheab/ultimate-task.git
