@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { getOrdersData } from '../Dummy/orders-dummy';
 import { Order } from '../interfaces/Order';
 import { OrderFilter } from '../interfaces/OrderFilter';
@@ -20,6 +20,8 @@ export class OrderService {
   );
   private readonly _currentOrder = new BehaviorSubject<Order | null>(null);
 
+  public readonly error = signal<string>('')
+
   get orders(): Observable<Order[]> {
     return this._orders;
   }
@@ -34,7 +36,11 @@ export class OrderService {
 
   getOrders(filter: OrderFilter): Observable<Order[]> {
     return of(getOrdersData(10, filter)).pipe(
-      tap((res) => this._orders.next(res))
+      tap((res) => this._orders.next(res)),
+      catchError((err) => {
+        this.error.set(err)
+        return of()
+      })
     );
   }
 }

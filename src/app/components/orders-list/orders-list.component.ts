@@ -8,14 +8,14 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { interval, retry, switchMap } from 'rxjs';
 import { Order } from '../../shared/interfaces/Order';
+import { OrderFilter } from '../../shared/interfaces/OrderFilter';
 import { OrderService } from '../../shared/services/order.service';
 import { OrdersFilterComponent } from './orders-filter/orders-filter.component';
-import { OrderFilter } from '../../shared/interfaces/OrderFilter';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-orders-list',
@@ -82,6 +82,8 @@ export class OrdersListComponent {
 
   public readonly sortValue = signal<Sort>({ active: '', direction: '' });
 
+  public readonly error = this._ordersService.error;
+
   constructor() {
     interval(30000)
       .pipe(
@@ -100,5 +102,9 @@ export class OrdersListComponent {
 
   sortChange(e: Sort): void {
     this.sortValue.set(e);
+  }
+
+  tryFetchAgain(): void {
+    this._ordersService.getOrders(this.filter).pipe(retry(2)).subscribe();
   }
 }

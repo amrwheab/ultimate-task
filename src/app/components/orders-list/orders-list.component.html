@@ -2,6 +2,20 @@
 
 <hr class="my-3">
 
+@if (error()) {
+  <div class="bg-red-100 border-t-4 border-red-500 rounded-b text-red-900 px-4 py-3 shadow-md max-h-24 max-w-96" role="alert">
+    <div class="flex">
+      <div class="py-1 flex gap-2">
+        <mat-icon class="text-red-900">info</mat-icon>
+        <div>
+          <p class="font-bold">Error fetching Your data</p>
+          <p class="text-sm underline cursor-pointer" (click)="tryFetchAgain()">Try again.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 <div class="overflow-x-auto mt-3">
   <table mat-table [dataSource]="sortedDataSource() || []" matSort (matSortChange)="sortChange($event)"
     class="mat-elevation-z8">
